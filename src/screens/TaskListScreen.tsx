@@ -41,6 +41,14 @@ const TaskListScreen: React.FC = () => {
     setTasks((prevTasks) => [...prevTasks, newTask]);
     setNewTaskText("");
   };
+
+  const toggleTaskCompleted = (taskId: string) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -52,7 +60,13 @@ const TaskListScreen: React.FC = () => {
         <FlatList
           data={tasks}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <TaskItem task={item} />}
+          renderItem={({ item }) => (
+            <TaskItem
+              task={item}
+              onToggle={toggleTaskCompleted}
+              onDelete={() => {}}
+            />
+          )}
           ListEmptyComponent={<Text>No hay tareas aún.</Text>}
         />
         <View style={styles.inputContainer}>
