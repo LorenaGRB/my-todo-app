@@ -49,6 +49,10 @@ const TaskListScreen: React.FC = () => {
       )
     );
   };
+
+  const deleteTask = (taskId: string) => {
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+  };
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -64,7 +68,7 @@ const TaskListScreen: React.FC = () => {
             <TaskItem
               task={item}
               onToggle={toggleTaskCompleted}
-              onDelete={() => {}}
+              onDelete={deleteTask}
             />
           )}
           ListEmptyComponent={<Text>No hay tareas aún.</Text>}
