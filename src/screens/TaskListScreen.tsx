@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import TaskItem from "../components/TaskItem";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { loadTasks, saveTasks } from "../storage/storage";
 
 interface Task {
   id: string;
@@ -26,32 +27,44 @@ const TaskListScreen: React.FC = () => {
   ]);
   const [newTaskText, setNewTaskText] = useState("");
 
+  useEffect(() => {
+    const fetchTasks = async () => {
+      const storedTasks = await loadTasks();
+      if (storedTasks.length) {
+        setTasks(storedTasks);
+      }
+    };
+    fetchTasks();
+  }, []);
+
   const addTask = () => {
     const text = newTaskText.trim();
-    if (text === "") {
-      return;
-    }
-
-    const newTask: Task = {
-      id: Date.now().toString(),
-      text: text,
-      completed: false,
-    };
-
-    setTasks((prevTasks) => [...prevTasks, newTask]);
+    if (text === "") return;
+    const newTask: Task = { id: Date.now().toString(), text, completed: false };
+    setTasks((prevTasks) => {
+      const updatedTasks = [...prevTasks, newTask];
+      saveTasks(updatedTasks);
+      return updatedTasks;
+    });
     setNewTaskText("");
   };
 
   const toggleTaskCompleted = (taskId: string) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
+    setTasks((prevTasks) => {
+      const updatedTasks = prevTasks.map((task) =>
         task.id === taskId ? { ...task, completed: !task.completed } : task
-      )
-    );
+      );
+      saveTasks(updatedTasks);
+      return updatedTasks;
+    });
   };
 
   const deleteTask = (taskId: string) => {
-    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+    setTasks((prevTasks) => {
+      const updatedTasks = prevTasks.filter((task) => task.id !== taskId);
+      saveTasks(updatedTasks);
+      return updatedTasks;
+    });
   };
   return (
     <SafeAreaView style={styles.container}>
